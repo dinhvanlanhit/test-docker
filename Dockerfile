@@ -11,7 +11,7 @@ COPY . /var/www/html
 WORKDIR /var/www/html
 
 # Chạy lệnh composer install nếu dự án của bạn sử dụng Composer
-# RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 # RUN composer install --no-scripts
 
 # Mở cổng 9000 để PHP-FPM có thể lắng nghe
