@@ -20,10 +20,10 @@ WORKDIR /var/www/html
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Chạy composer install để cài đặt các dependencies (nếu có)
-RUN composer install --no-scripts --no-autoloader
+# RUN composer install --no-scripts --no-autoloader
 
 # Sao lưu autoloader
-RUN composer dump-autoload --optimize
+# RUN composer dump-autoload --optimize
 
 # Mở cổng 9000 để PHP-FPM có thể lắng nghe
 EXPOSE 9000
