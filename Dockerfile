@@ -1,19 +1,7 @@
-# Sử dụng ảnh chính thức của Nginx
-FROM nginx:latest
+# Sử dụng hình ảnh chính thức của PHP
+FROM php:7.4-fpm
 
-# Xóa tệp cấu hình mặc định
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy tệp cấu hình nginx của bạn vào bên trong container
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Tạo thư mục cho các site
-RUN mkdir -p /etc/nginx/sites-enabled
-
-# Expose cổng 80
-EXPOSE 80
-
-# Cài đặt các gói phụ thuộc cần thiết để cài đặt extension PHP và Composer
+# Cài đặt các extension PHP cần thiết
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -22,10 +10,10 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    && docker-php-ext-install pdo pdo_mysql mysqli gd zip
 
-# Cài đặt các extension PHP
-RUN docker-php-ext-install pdo pdo_mysql mysqli gd zip
+# Cài đặt Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Khởi động nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Khởi động PHP-FPM
+CMD ["php-fpm"]

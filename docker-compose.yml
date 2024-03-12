@@ -1,7 +1,18 @@
 version: '3'
 services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
   nginx:
-    build: .
     image: nginx:latest
     ports:
       - "8082:80"
@@ -12,15 +23,7 @@ services:
       - php
     networks:
       - app-network
-  php:
-    image: php:7.4-fpm
-    restart: always
-    volumes:
-      - ./:/var/www/html
-    depends_on:
-      - mysql
-    networks:
-      - app-network
+
   mysql:
     image: mysql:latest
     environment:
@@ -31,10 +34,11 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./data:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql   # Define volume for MySQL data
     networks:
       - app-network
-    command: ["--default-authentication-plugin=mysql_native_password", "--bind-address=0.0.0.0"]
+    # command: ["--default-authentication-plugin=mysql_native_password", "--bind-address=0.0.0.0"]
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     environment:
@@ -45,6 +49,10 @@ services:
       - "8081:80"
     networks:
       - app-network
+    volumes:
+      - ./phpmyadmin:/etc/phpmyadmin   # Define volume for phpMyAdmin configuration
+      - ./sessions:/sessions            # Define volume for phpMyAdmin sessions
+
 networks:
   app-network:
     driver: bridge
