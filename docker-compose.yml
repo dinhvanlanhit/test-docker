@@ -1,5 +1,20 @@
 version: '3'
 services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: taoanhpro
+      MYSQL_PASSWORD: taoanhpro
+      MYSQL_DATABASE: taoanhpro
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql   # Define volume for MySQL data
+    networks:
+      - app-network
+    # command: ["--default-authentication-plugin=mysql_native_password", "--bind-address=0.0.0.0"]
+    
   php:
     build:
       context: .
@@ -24,21 +39,6 @@ services:
     networks:
       - app-network
 
-  mysql:
-    image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: taoanhpro
-      MYSQL_PASSWORD: taoanhpro
-      MYSQL_DATABASE: taoanhpro
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./data/mysql:/var/lib/mysql   # Define volume for MySQL data
-    networks:
-      - app-network
-    # command: ["--default-authentication-plugin=mysql_native_password", "--bind-address=0.0.0.0"]
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     environment:
@@ -49,9 +49,9 @@ services:
       - "8081:80"
     networks:
       - app-network
-    volumes:
-      - ./phpmyadmin:/etc/phpmyadmin   # Define volume for phpMyAdmin configuration
-      - ./sessions:/sessions            # Define volume for phpMyAdmin sessions
+    # volumes:
+    #   - ./phpmyadmin:/etc/phpmyadmin   # Define volume for phpMyAdmin configuration
+    #   - ./sessions:/sessions            # Define volume for phpMyAdmin sessions
 
 networks:
   app-network:
