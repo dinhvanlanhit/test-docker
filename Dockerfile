@@ -1,29 +1,31 @@
-# Sử dụng một hình ảnh PHP cụ thể với PHP và Nginx
-FROM php:7.4-fpm
+# Sử dụng ảnh chính thức của Nginx
+FROM nginx:latest
 
-# Cài đặt các extension PHP cần thiết từ các gói đã được cài đặt sẵn trong hình ảnh
+# Xóa tệp cấu hình mặc định
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy tệp cấu hình nginx của bạn vào bên trong container
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Tạo thư mục cho các site
+RUN mkdir -p /etc/nginx/sites-enabled
+
+# Expose cổng 80
+EXPOSE 80
+
+# Cài đặt các gói phụ thuộc cần thiết để cài đặt extension PHP và Composer
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
     libzip-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mysqli zip
+    zip \
+    unzip \
+    git \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Sao chép mã nguồn ứng dụng vào hệ thống tệp của container
-COPY . /var/www/html
+# Cài đặt các extension PHP
+RUN docker-php-ext-install pdo pdo_mysql mysqli gd zip
 
-# Đặt thư mục làm việc
-WORKDIR /var/www/html
-
-# Cài đặt Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Chạy composer install để cài đặt các dependencies (nếu có)
-# RUN composer install --no-scripts --no-autoloader
-
-# Sao lưu autoloader
-# RUN composer dump-autoload --optimize
-
-# Mở cổng 9000 để PHP-FPM có thể lắng nghe
-EXPOSE 9000
+# Khởi động nginx
+CMD ["nginx", "-g", "daemon off;"]
